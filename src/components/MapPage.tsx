@@ -1,5 +1,4 @@
 import React, { useState } from 'react'; // Import React for type definitions
-import { useNavigate } from 'react-router-dom';
 import Header from './Header'; // Assuming you have these components
 import Footer from './Footer'; // Assuming you have these components
 import SocioEconomicStatsMap from './SocioEconomicStatsMap'; // Assuming you have this component
