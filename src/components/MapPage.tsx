@@ -1,51 +1,62 @@
-import { useState } from 'react';
+import React, { useState } from 'react'; // Import React for type definitions
 import { useNavigate } from 'react-router-dom';
-import Header from './Header';
-import Footer from './Footer';
-import SocioEconomicStatsMap from './SocioEconomicStatsMap';
+import Header from './Header'; // Assuming you have these components
+import Footer from './Footer'; // Assuming you have these components
+import SocioEconomicStatsMap from './SocioEconomicStatsMap'; // Assuming you have this component
 
-// Gemini API integration setup (placeholder)
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
-const GEMINI_API_KEY = import.meta.env.GEMINI_API_KEY;; // Replace with your actual API key
+// Define a type for our chat messages for strong type safety
+interface Message {
+  sender: 'bot' | 'user';
+  text: string;
+}
 
-async function sendToGemini(message: string) {
-  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY') {
-    // No API key set, fallback to mock
-    return 'Settlr Agent: (Mock) I\'ve analyzed your request!';
-  }
+// This function now calls YOUR backend. No API key is needed here!
+async function sendToSettlrAgent(message: string): Promise<string> {
+  // The URL for your FastAPI backend. Default port for uvicorn is 8000.
+  const BACKEND_URL = 'http://localhost:8000/api/chat'; 
+
   try {
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(BACKEND_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: message }] }]
-      })
+      body: JSON.stringify({ message: message })
     });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      // FastAPI uses 'detail' for HTTPException errors
+      return `Settlr Agent: Error - ${errorData.detail || 'Something went wrong on the server.'}`;
+    }
+
     const data = await response.json();
-    return data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Settlr Agent: Sorry, I could not get a response.';
+    return data.reply || 'Settlr Agent: Sorry, I could not get a response.';
   } catch (err) {
-    return 'Settlr Agent: There was an error contacting Gemini.';
+    console.error('Error contacting backend:', err);
+    return 'Settlr Agent: There was an error connecting to the agent. Is the backend server running?';
   }
 }
 
-const SettlrAgent = () => {
-  const [messages, setMessages] = useState([
+const SettlrAgent: React.FC = () => {
+  // Use the Message interface to strongly type our state array
+  const [messages, setMessages] = useState<Message[]>([
     { sender: 'bot', text: 'Hi! I\'m the Settlr Agent. Tell me what you\'re looking for in a neighbourhood, and I\'ll help you find the best matches!' }
   ]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [input, setInput] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSend = async () => {
     if (!input.trim()) return;
-    setMessages([...messages, { sender: 'user', text: input }]);
+    const userMessage: Message = { sender: 'user', text: input };
+    // Use functional update to ensure state is always fresh
+    setMessages(currentMessages => [...currentMessages, userMessage]);
     setLoading(true);
-    const reply = await sendToGemini(input);
-    setMessages(current => [
-      ...current,
-      { sender: 'bot', text: reply }
-    ]);
+    setInput(''); // Clear input immediately for better UX
+
+    const replyText = await sendToSettlrAgent(input);
+
+    const botMessage: Message = { sender: 'bot', text: replyText };
+    setMessages(currentMessages => [...currentMessages, botMessage]);
     setLoading(false);
-    setInput('');
   };
 
   return (
@@ -81,10 +92,11 @@ const SettlrAgent = () => {
         <input
           className="flex-1 border border-gray-300 rounded-l-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           type="text"
-          placeholder="Ask Settlr Agent about neighbourhoods..."
+          placeholder="Ask about safe areas, schools, growth..."
           value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
+          // Add explicit types for event handlers
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') handleSend(); }}
           disabled={loading}
         />
         <button
@@ -99,7 +111,7 @@ const SettlrAgent = () => {
   );
 };
 
-const MapPage = () => {
+const MapPage: React.FC = () => {
   const [showMap, setShowMap] = useState(false);
 
   return (
@@ -251,4 +263,4 @@ const MapPage = () => {
   );
 };
 
-export default MapPage; 
+export default MapPage;
