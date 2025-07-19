@@ -56,14 +56,14 @@ const Header = () => {
             >
               Map
             </button>
-            <button className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
-              About
-            </button>
           </nav>
 
           {/* CTA Button */}
           <div className="flex items-center">
-            <button className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors duration-200">
+            <button 
+              onClick={handleMapClick}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors duration-200"
+            >
               Get Started
             </button>
           </div>
