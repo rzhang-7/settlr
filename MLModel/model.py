@@ -3,11 +3,10 @@ import numpy as np
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.preprocessing import MinMaxScaler
 
 # --- Configuration ---
 MASTER_DATA_FILE = '../data_processing/MasterDataset.csv'
-OUTPUT_FILE = 'SocioeconomicStats.csv'
+OUTPUT_FILE = 'PredictedSocioeconomicGrowth.csv'
 
 def feature_engineering(df):
     """
@@ -41,45 +40,21 @@ def feature_engineering(df):
 
 def train_and_predict_growth():
     """
-    Main function to calculate both a 'Current Vibrancy Score' and a predicted 'Growth Potential Score'.
+    Main function to load data, train the model, and predict future growth.
     """
     df = pd.read_csv(MASTER_DATA_FILE)
     df = feature_engineering(df)
     
-    # ==================================================================
-    # ** NEW SECTION: Create the "Current Vibrancy Score" **
-    # ==================================================================
-    print("\nCalculating the 'Current Vibrancy Score'...")
-    
-    # 1. Normalize the component features to a 0-1 scale
-    scaler = MinMaxScaler()
-    # Note: For safety, lower is better, so we will invert its normalized score later.
-    df['safety_norm'] = scaler.fit_transform(df[['safety_score_2023']])
-    df['schools_norm'] = scaler.fit_transform(df[['schools_per_1000_capita']])
-    df['businesses_norm'] = scaler.fit_transform(df[['businesses_per_1000_capita']])
-    
-    # Invert the safety score (a low crime score should equal a high safety rating)
-    df['safety_norm'] = 1 - df['safety_norm']
-    
-    # 2. Calculate the weighted average
-    vibrancy_score = (df['safety_norm'] * 0.50 +      # 50% weight for safety
-                      df['schools_norm'] * 0.30 +     # 30% weight for schools
-                      df['businesses_norm'] * 0.20)   # 20% weight for businesses
-                      
-    # 3. Scale the final score to be out of 100
-    df['current_vibrancy_score'] = vibrancy_score * 100
-    
-    # --- Machine Learning for the "Growth Potential Score" ---
     print("\nSimulating historical property value data for training...")
     np.random.seed(42)
-    safety_norm_sim = df['safety_score_2023'].fillna(df['safety_score_2023'].mean())
-    schools_norm_sim = df['schools_per_1000_capita'].fillna(df['schools_per_1000_capita'].mean())
-    construction_norm_sim = df['construction_per_1000_capita'].fillna(df['construction_per_1000_capita'].mean())
+    safety_norm = df['safety_score_2023'].fillna(df['safety_score_2023'].mean())
+    schools_norm = df['schools_per_1000_capita'].fillna(df['schools_per_1000_capita'].mean())
+    construction_norm = df['construction_per_1000_capita'].fillna(df['construction_per_1000_capita'].mean())
     
     simulated_growth = (
-        -0.05 * safety_norm_sim / safety_norm_sim.mean() +
-        0.10 * schools_norm_sim / schools_norm_sim.mean() +
-        0.15 * construction_norm_sim / construction_norm_sim.mean() +
+        -0.05 * safety_norm / safety_norm.mean() +
+        0.10 * schools_norm / schools_norm.mean() +
+        0.15 * construction_norm / construction_norm.mean() +
         np.random.normal(0, 0.05, len(df))
     )
     df['property_value_growth_3yr'] = 0.15 + simulated_growth
@@ -98,6 +73,12 @@ def train_and_predict_growth():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
     print("\nTraining the XGBoost Regressor model...")
+    
+    # ==================================================================
+    # ** THE FINAL, FAILSAFE CODE FOR YOUR OLDER XGBOOST VERSION **
+    # ==================================================================
+    
+    # 1. The constructor is now very simple.
     xgbr = xgb.XGBRegressor(
         objective='reg:squarederror',
         n_estimators=1000,
@@ -107,42 +88,44 @@ def train_and_predict_growth():
         colsample_bytree=0.8,
         random_state=42,
         n_jobs=-1,
-        eval_metric='rmse',               # ✅ moved from .fit()
-        early_stopping_rounds=50          # ✅ moved from .fit()
+        eval_metric='rmse',                # <- moved here
+        early_stopping_rounds=50          # <- moved here
     )
-
-    xgbr.fit(X_train, y_train, eval_set=[(X_test, y_test)], verbose=False)
-
+    xgbr.fit(
+        X_train, y_train,
+        eval_set=[(X_test, y_test)],
+        verbose=False
+    )
     
+    # --- Evaluation and Prediction ---
     print("\nEvaluating model performance...")
     preds = xgbr.predict(X_test)
-    print(f"Test Set RMSE: {np.sqrt(mean_squared_error(y_test, preds)):.4f}")
-    print(f"Test Set R-squared: {r2_score(y_test, preds):.4f}")
+    rmse = np.sqrt(mean_squared_error(y_test, preds))
+    r2 = r2_score(y_test, preds)
+    print(f"Test Set RMSE: {rmse:.4f}")
+    print(f"Test Set R-squared: {r2:.4f}")
     
     print("\n--- Top 10 Most Important Features ---")
-    feature_importances = pd.DataFrame({'feature': features, 'importance': xgbr.feature_importances_}).sort_values('importance', ascending=False)
+    feature_importances = pd.DataFrame({
+        'feature': features,
+        'importance': xgbr.feature_importances_
+    }).sort_values('importance', ascending=False)
     print(feature_importances.head(10))
     
     print("\nGenerating final 'Growth Potential Score' for all neighborhoods...")
-    raw_predictions = xgbr.predict(X)
-    min_score = raw_predictions.min()
-    max_score = raw_predictions.max()
-    df['growth_potential_score'] = 100 * (raw_predictions - min_score) / (max_score - min_score)
+    df['growth_potential_score'] = xgbr.predict(X)
     
-    # --- Save the Final Output for the App ---
-    output_cols = [
-        'HOOD_ID', 'AREA_NAME', 
-        'current_vibrancy_score',   # The "Present" score
-        'growth_potential_score',   # The "Future" score
-        'geometry'
-    ]
+    min_score = df['growth_potential_score'].min()
+    max_score = df['growth_potential_score'].max()
+    df['growth_potential_score'] = 100 * (df['growth_potential_score'] - min_score) / (max_score - min_score)
     
+    output_cols = ['HOOD_ID', 'AREA_NAME', 'growth_potential_score', 'geometry'] + features
     final_df = df[output_cols]
     final_df.to_csv(OUTPUT_FILE, index=False)
     
-    print(f"\nSuccess! Final data with both scores saved to '{OUTPUT_FILE}'")
+    print(f"\nSuccess! Final data with growth scores saved to '{OUTPUT_FILE}'")
     print("\n--- Sample of Final App Data ---")
-    print(final_df[['AREA_NAME', 'current_vibrancy_score', 'growth_potential_score']].sort_values('growth_potential_score', ascending=False).head())
+    print(final_df[['AREA_NAME', 'growth_potential_score']].sort_values('growth_potential_score', ascending=False).head())
 
 if __name__ == '__main__':
     train_and_predict_growth()
