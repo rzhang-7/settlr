@@ -25,12 +25,12 @@ const HomePage = () => {
             {/* Main Heading */}
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
               Find Your Perfect
-              <span className="text-indigo-600 block">Neighborhood</span>
+                              <span className="text-indigo-600 block">Neighbourhood</span>
             </h1>
             
             {/* Subtitle */}
             <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Settlr uses AI-powered analysis to help you discover ideal neighborhoods 
+              Settlr uses AI-powered analysis to help you discover ideal neighbourhoods 
               based on your unique preferences for education, culture, affordability, and lifestyle.
             </p>
 
@@ -41,7 +41,7 @@ const HomePage = () => {
               onClick={handleExploreMap}
               className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 px-8 rounded-lg text-lg transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
             >
-              Explore Neighborhoods
+                              Explore Neighbourhoods
             </button>
 
             {/* Additional Info */}
@@ -117,7 +117,7 @@ const HomePage = () => {
                   <div className="bg-white rounded-lg border-2 border-indigo-200 shadow-lg p-8 transition-all duration-300">
                     <h3 className="text-3xl font-bold text-gray-900 mb-4">AI Analysis</h3>
                     <p className="text-xl text-gray-600 leading-relaxed">
-                      Our AI analyzes thousands of data points to find neighborhoods that match your criteria.
+                      Our AI analyzes thousands of data points to find neighbourhoods that match your criteria.
                     </p>
                   </div>
                 ) : (
@@ -149,7 +149,7 @@ const HomePage = () => {
                   <div className="bg-white rounded-lg border-2 border-indigo-200 shadow-lg p-8 transition-all duration-300">
                     <h3 className="text-3xl font-bold text-gray-900 mb-4">Get Rankings</h3>
                     <p className="text-xl text-gray-600 leading-relaxed">
-                      Receive personalized neighborhood rankings with detailed explanations and insights.
+                      Receive personalized neighbourhood rankings with detailed explanations and insights.
                     </p>
                   </div>
                 ) : (
@@ -199,8 +199,8 @@ const HomePage = () => {
         {/* Call to Action */}
         <div className="text-center mt-16">
             <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-12 max-w-4xl mx-auto">
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">Ready to start your neighborhood search?</h3>
-              <p className="text-xl text-gray-600 mb-8">Join thousands of users who have found their perfect neighborhood with Settlr.</p>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Ready to start your neighbourhood search?</h3>
+              <p className="text-xl text-gray-600 mb-8">Join thousands of users who have found their perfect neighbourhood with Settlr.</p>
               <button
                 onClick={handleExploreMap}
                 className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-4 px-8 rounded-lg text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"

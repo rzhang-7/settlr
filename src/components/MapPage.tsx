@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
+import SocioEconomicStatsMap from './SocioEconomicStatsMap';
 
 // Gemini API integration setup (placeholder)
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
@@ -99,7 +100,7 @@ const SettlrAgent = () => {
 };
 
 const MapPage = () => {
-  const navigate = useNavigate();
+  const [showMap, setShowMap] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -108,9 +109,9 @@ const MapPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Interactive Neighborhood Map</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Interactive Neighbourhood Map</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Choose your preferred way to find neighborhoods: use detailed search preferences or chat with our Settlr Agent AI.
+              Choose your preferred way to find neighbourhoods: use detailed search preferences, chat with our Settlr Agent AI, or explore the interactive map.
             </p>
           </div>
 
@@ -127,6 +128,11 @@ const MapPage = () => {
                 <div className="w-4 h-4 bg-green-600 rounded-full"></div>
                 <span className="text-gray-700 font-medium">Settlr Agent AI Chat</span>
               </div>
+              <div className="text-gray-400">OR</div>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-blue-600 rounded-full"></div>
+                <span className="text-gray-700 font-medium">Interactive Map</span>
+              </div>
             </div>
           </div>
 
@@ -141,7 +147,7 @@ const MapPage = () => {
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Education Quality</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Education Proximity</label>
                     <select className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                       <option>High Priority</option>
                       <option>Medium Priority</option>
@@ -183,7 +189,7 @@ const MapPage = () => {
                 </div>
                 <div className="space-y-4">
                   <div className="bg-white rounded-lg p-4 border">
-                    <h4 className="font-semibold text-gray-900 mb-2">Top Recommended Neighborhoods</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">Top Recommended Neighbourhoods</h4>
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">Downtown Core</span>
@@ -211,16 +217,32 @@ const MapPage = () => {
             </div>
           </div>
 
-          {/* Map Placeholder */}
-          <div className="bg-gray-100 rounded-lg h-96 flex items-center justify-center mt-8">
-            <div className="text-center">
-              <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">Interactive Map Coming Soon</h3>
-              <p className="text-gray-500">This is where the interactive map with neighborhood data will be displayed.</p>
+          {/* Interactive Map Section */}
+          <div className="mt-8">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Interactive Toronto Neighbourhood Map</h3>
+              <p className="text-gray-600 mb-4">
+                Explore Toronto neighbourhoods with detailed socioeconomic statistics and growth potential data.
+              </p>
+              <button
+                onClick={() => setShowMap(!showMap)}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center mx-auto"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {showMap ? 'Hide Interactive Map' : 'Show Interactive Map'}
+              </button>
             </div>
+            
+            {showMap && (
+              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div className="h-[600px] w-full">
+                  <SocioEconomicStatsMap />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

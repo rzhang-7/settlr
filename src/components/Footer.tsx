@@ -22,11 +22,11 @@ const Footer = () => {
               </div>
               <div>
                 <h3 className="text-xl font-bold">Settlr</h3>
-                <p className="text-sm text-gray-400">Find Your Perfect Neighborhood</p>
+                <p className="text-sm text-gray-400">Find Your Perfect Neighbourhood</p>
               </div>
             </div>
             <p className="text-gray-400 mb-6 max-w-md">
-              AI-powered neighborhood discovery platform helping you find the perfect place to call home 
+              AI-powered neighbourhood discovery platform helping you find the perfect place to call home 
               based on your unique preferences for education, culture, affordability, and lifestyle.
             </p>
             <div className="flex space-x-4">
