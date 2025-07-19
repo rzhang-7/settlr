@@ -5,7 +5,7 @@ import Footer from './Footer';
 
 // Gemini API integration setup (placeholder)
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
-const GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY'; // Replace with your actual API key
+const GEMINI_API_KEY = import.meta.env.GEMINI_API_KEY;; // Replace with your actual API key
 
 async function sendToGemini(message: string) {
   if (!GEMINI_API_KEY || GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY') {
