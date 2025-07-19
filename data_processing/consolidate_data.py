@@ -107,8 +107,8 @@ def train_and_predict_growth():
         colsample_bytree=0.8,
         random_state=42,
         n_jobs=-1,
-        eval_metric='rmse',               # ✅ moved from .fit()
-        early_stopping_rounds=50          # ✅ moved from .fit()
+        eval_metric='rmse',               
+        early_stopping_rounds=50          
     )
 
     xgbr.fit(X_train, y_train, eval_set=[(X_test, y_test)], verbose=False)
