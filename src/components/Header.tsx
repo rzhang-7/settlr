@@ -29,9 +29,8 @@ const Header = () => {
                 </svg>
               </div>
               <div className="flex flex-col items-start">
-                <h1 className="text-2xl font-bold text-gray-900 text-left">Settlr</h1>
-                <p className="text-xs text-gray-500 -mt-1 text-left">Find Your Perfect Neighborhood</p>
-              </div>
+                <h1 className="text-3xl font-bold text-gray-900 text-left">Settlr</h1>
+               </div>
             </button>
           </div>
 
