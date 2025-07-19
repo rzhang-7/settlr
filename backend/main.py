@@ -25,7 +25,7 @@ app.add_middleware(
 )
 
 # --- Load Data ONCE at Startup ---
-CSV_PATH = 'PredictedSocioeconomicGrowth.csv'
+CSV_PATH = 'SocioeconomicStats.csv'
 try:
     neighborhood_df = pd.read_csv(CSV_PATH)
     print(f"Successfully loaded and parsed {len(neighborhood_df)} neighborhood records.")
@@ -36,7 +36,7 @@ except FileNotFoundError:
 # --- Configure Gemini API ---
 try:
     genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-    model = genai.GenerativeModel('gemini-pro')
+    model = genai.GenerativeModel('gemini-2.0-flash')
 except Exception as e:
     print(f"FATAL ERROR: Could not configure Gemini API. Check your GEMINI_API_KEY. Error: {e}")
     exit()
