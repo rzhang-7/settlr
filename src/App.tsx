@@ -1,13 +1,16 @@
-// import { useState } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import HomePage from './components/HomePage';
+import MapPage from './components/MapPage';
 
 function App() {
-
   return (
-    <>
-      <h1 className="text-3xl font-bold underline">Settlr</h1>
-      <p>Hello World!</p>
-    </>
-  )
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/map" element={<MapPage />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
