@@ -3,10 +3,12 @@ import numpy as np
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
+# Import the scaler for our new scores
+from sklearn.preprocessing import MinMaxScaler
 
 # --- Configuration ---
 MASTER_DATA_FILE = '../data_processing/MasterDataset.csv'
-OUTPUT_FILE = 'PredictedSocioeconomicGrowth.csv'
+OUTPUT_FILE = 'SocioeconomicStats.csv'
 
 def feature_engineering(df):
     """
@@ -74,11 +76,7 @@ def train_and_predict_growth():
     
     print("\nTraining the XGBoost Regressor model...")
     
-    # ==================================================================
-    # ** THE FINAL, FAILSAFE CODE FOR YOUR OLDER XGBOOST VERSION **
-    # ==================================================================
-    
-    # 1. The constructor is now very simple.
+    # Using the older API structure that matches your environment
     xgbr = xgb.XGBRegressor(
         objective='reg:squarederror',
         n_estimators=1000,
@@ -113,19 +111,53 @@ def train_and_predict_growth():
     print(feature_importances.head(10))
     
     print("\nGenerating final 'Growth Potential Score' for all neighborhoods...")
-    df['growth_potential_score'] = xgbr.predict(X)
+    raw_predictions = xgbr.predict(X)
+    min_score = raw_predictions.min()
+    max_score = raw_predictions.max()
+    df['growth_potential_score'] = 100 * (raw_predictions - min_score) / (max_score - min_score)
     
-    min_score = df['growth_potential_score'].min()
-    max_score = df['growth_potential_score'].max()
-    df['growth_potential_score'] = 100 * (df['growth_potential_score'] - min_score) / (max_score - min_score)
+    # ==================================================================
+    # ** NEW SECTION: Calculate Current Status Scores **
+    # ==================================================================
+    print("\nCalculating Current Status Scores (Safety, School, Business)...")
     
-    output_cols = ['HOOD_ID', 'AREA_NAME', 'growth_potential_score', 'geometry'] + features
+    # Initialize a scaler to put scores on a 0-100 range
+    scaler = MinMaxScaler(feature_range=(0, 100))
+    
+    # --- Safety Score ---
+    # A lower raw crime score is better. We will scale and then invert it.
+    raw_safety_values = df[['safety_score_2023']].fillna(0)
+    scaled_safety = scaler.fit_transform(raw_safety_values)
+    df['safety_score'] = 100 - scaled_safety # Invert the score
+
+    # --- School Score ---
+    raw_school_values = df[['schools_per_1000_capita']].fillna(0)
+    df['school_score'] = scaler.fit_transform(raw_school_values)
+
+    # --- Business/Job Score (Amenity Score) ---
+    raw_business_values = df[['businesses_per_1000_capita']].fillna(0)
+    df['business_job_score'] = scaler.fit_transform(raw_business_values)
+    
+    # ==================================================================
+    # ** FINAL STEP: Define Output Columns and Save **
+    # ==================================================================
+    
+    # Define the clean, final columns for the app's use
+    output_cols = [
+        'HOOD_ID', 'AREA_NAME', 
+        'growth_potential_score',   # The "Future" score
+        'safety_score',             # The "Present" safety score
+        'school_score',             # The "Present" school score
+        'business_job_score',       # The "Present" business/amenity score
+        'geometry'
+    ]
+    
     final_df = df[output_cols]
     final_df.to_csv(OUTPUT_FILE, index=False)
     
-    print(f"\nSuccess! Final data with growth scores saved to '{OUTPUT_FILE}'")
+    print(f"\nSuccess! Final data with all scores saved to '{OUTPUT_FILE}'")
     print("\n--- Sample of Final App Data ---")
-    print(final_df[['AREA_NAME', 'growth_potential_score']].sort_values('growth_potential_score', ascending=False).head())
+    print(final_df[['AREA_NAME', 'growth_potential_score', 'safety_score', 'school_score', 'business_job_score']].sort_values('growth_potential_score', ascending=False).head())
 
 if __name__ == '__main__':
     train_and_predict_growth()
