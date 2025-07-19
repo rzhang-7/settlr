@@ -30,8 +30,8 @@ const HomePage = () => {
             
             {/* Subtitle */}
             <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Settlr uses AI-powered analysis to help you discover ideal neighbourhoods 
-              based on your unique preferences for education, culture, affordability, and lifestyle.
+              Discover ideal neighbourhoods in Toronto
+              based on your unique preferences through the power of AI.
             </p>
 
             
