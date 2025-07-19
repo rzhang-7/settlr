@@ -1,82 +1,53 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask
 from pymongo import MongoClient
+from urllib.parse import quote_plus
+import certifi  # For Solution 2
 
 app = Flask(__name__)
 
-# MongoDB connection setup
 def get_db():
-    # Replace with your MongoDB connection string
-    client = MongoClient("mongodb://localhost:27017/")
-    db = client["MegaData"]  # Your database name
-    return db
+    username = "maksimichess"
+    password = "dYgL1UN5yBHLeOko"
+    cluster = "settlrcluster.bmklrom.mongodb.net"
+    
+    escaped_username = quote_plus(username)
+    escaped_password = quote_plus(password)
+    
+    connection_string = f"mongodb+srv://{escaped_username}:{escaped_password}@{cluster}/?retryWrites=true&w=majority"
+    
+    try:
+        client = MongoClient(
+            connection_string,
+            tls=True,
+            tlsCAFile=certifi.where(),  # For Solution 2
+            # tlsAllowInvalidCertificates=True,  # For Solution 1
+            connectTimeoutMS=30000,
+            socketTimeoutMS=30000
+        )
+        return client["MegaData"]
+    except Exception as e:
+        print(f"Connection error: {e}")
+        raise
 
 @app.route('/')
-def home():
-    return """
-    <h1>MegaData CSV Data Access</h1>
-    <p>Available endpoints:</p>
-    <ul>
-        <li><a href="/csvdata">/csvdata</a> - Get all CSV data</li>
-        <li>/csvdata/&lt;field&gt;/&lt;value&gt; - Filter data (e.g. <a href="/csvdata/name/John">/csvdata/name/John</a>)</li>
-        <li><a href="/view-data">/view-data</a> - View data in HTML table</li>
-    </ul>
-    """
-
-@app.route('/csvdata', methods=['GET'])
-def get_csv_data():
-    try:
-        db = get_db()
-        collection = db["csvdata"]  # Your collection name
-        
-        # Get all documents from the collection
-        data = list(collection.find({}, {'_id': 0}))  # Exclude _id by default
-        
-        return jsonify({
-            "status": "success",
-            "data": data
-        }), 200
-        
-    except Exception as e:
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 500
-
-@app.route('/csvdata/<field>/<value>', methods=['GET'])
-def get_filtered_data(field, value):
+def show_top_3():
     try:
         db = get_db()
         collection = db["csvdata"]
+        top_3 = list(collection.find({}, {'_id': 0}).limit(3))
         
-        # Create query - try to convert numeric values
-        try:
-            value = float(value) if '.' in value else int(value)
-        except ValueError:
-            pass
+        if not top_3:
+            return "No data found"
             
-        query = {field: value}
-        data = list(collection.find(query, {'_id': 0}))
+        fields = list(top_3[0].keys())
+        result = ["Top 3 Records:", " | ".join(fields), "-"*50]
+        for record in top_3:
+            result.append(" | ".join(str(record.get(f, "")) for f in fields))
         
-        return jsonify({
-            "status": "success",
-            "data": data
-        }), 200
-        
+        return "<pre>" + "\n".join(result) + "</pre>"
+    
     except Exception as e:
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 500
-
-@app.route('/view-data')
-def view_data():
-    try:
-        db = get_db()
-        collection = db["csvdata"]
-        data = list(collection.find({}, {'_id': 0}))
-        return render_template('data.html', data=data)
-    except Exception as e:
-        return f"Error: {str(e)}", 500
+        return f"Database error: {str(e)}"
 
 if __name__ == '__main__':
     app.run(debug=True)
