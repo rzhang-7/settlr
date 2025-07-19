@@ -48,7 +48,7 @@ const SettlrAgent = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col h-[32rem] max-h-[80vh]">
+    <div className="bg-gray-50 rounded-lg shadow-lg p-6 flex flex-col h-[32rem] max-h-[80vh] border-l-4 border-green-600">
       <div className="flex items-center mb-2">
         <div className="w-3 h-3 bg-green-600 rounded-full mr-3"></div>
         <h3 className="text-lg font-semibold text-green-700 flex items-center">
@@ -131,10 +131,10 @@ const MapPage = () => {
           </div>
 
           {/* Responsive grid: preferences + chatbot */}
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Search and Filter Section */}
-            <div className="md:col-span-2 grid md:grid-cols-2 gap-8">
-              <div className="bg-gray-50 rounded-lg p-6 mb-8 md:mb-0 border-l-4 border-indigo-600">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Left: Preferences and Results stacked */}
+            <div className="flex flex-col space-y-8">
+              <div className="bg-gray-50 rounded-lg p-6 border-l-4 border-indigo-600">
                 <div className="flex items-center mb-4">
                   <div className="w-3 h-3 bg-indigo-600 rounded-full mr-3"></div>
                   <h3 className="text-lg font-semibold text-gray-900">Manual Search Preferences</h3>
@@ -142,22 +142,6 @@ const MapPage = () => {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Education Quality</label>
-                    <select className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                      <option>High Priority</option>
-                      <option>Medium Priority</option>
-                      <option>Low Priority</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Cost of Living</label>
-                    <select className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                      <option>Affordable</option>
-                      <option>Moderate</option>
-                      <option>Premium</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Cultural Diversity</label>
                     <select className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                       <option>High Priority</option>
                       <option>Medium Priority</option>
@@ -182,14 +166,6 @@ const MapPage = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Proximity to Amenities</label>
-                    <select className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                      <option>Walking Distance</option>
-                      <option>Short Drive</option>
-                      <option>Not Important</option>
-                    </select>
-                  </div>
-                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Job Opportunities</label>
                     <select className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                       <option>Excellent</option>
@@ -200,9 +176,11 @@ const MapPage = () => {
                   </div>
                 </div>
               </div>
-
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">AI Analysis Results</h3>
+              <div className="bg-gray-50 rounded-lg p-6 border-l-4 border-indigo-600">
+                <div className="flex items-center mb-4">
+                  <div className="w-3 h-3 bg-indigo-600 rounded-full mr-3"></div>
+                  <h3 className="text-lg font-semibold text-gray-900">AI Analysis Results</h3>
+                </div>
                 <div className="space-y-4">
                   <div className="bg-white rounded-lg p-4 border">
                     <h4 className="font-semibold text-gray-900 mb-2">Top Recommended Neighborhoods</h4>
@@ -227,8 +205,8 @@ const MapPage = () => {
                 </div>
               </div>
             </div>
-            {/* Settlr Agent Chatbot Section */}
-            <div className="border-l-4 border-green-600">
+            {/* Right: Settlr Agent Chatbot */}
+            <div className="h-full flex flex-col">
               <SettlrAgent />
             </div>
           </div>
