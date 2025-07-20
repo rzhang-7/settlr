@@ -35,14 +35,23 @@ async function sendToSettlrAgent(message: string): Promise<string> {
   }
 }
 
-const SettlrAgent: React.FC = () => {
-  // Use the Message interface to strongly type our state array
-  const [messages, setMessages] = useState<Message[]>([
-    { sender: 'bot', text: 'Hi! I\'m the Settlr Agent. Tell me what you\'re looking for in a neighbourhood, and I\'ll help you find the best matches!' }
-  ]);
-  const [input, setInput] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
+interface SettlrAgentProps {
+  messages: Message[];
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  input: string;
+  setInput: React.Dispatch<React.SetStateAction<string>>;
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
+const SettlrAgent: React.FC<SettlrAgentProps> = ({ 
+  messages, 
+  setMessages, 
+  input, 
+  setInput, 
+  loading, 
+  setLoading 
+}) => {
   const handleSend = async () => {
     if (!input.trim()) return;
     const userMessage: Message = { sender: 'user', text: input };
@@ -115,6 +124,13 @@ const SettlrAgent: React.FC = () => {
 const MapPage: React.FC = () => {
   const [showMap, setShowMap] = useState(true);
   const [showChat, setShowChat] = useState(true);
+  
+  // Move chat state to MapPage to persist across collapse/expand
+  const [messages, setMessages] = useState<Message[]>([
+    { sender: 'bot', text: 'Hi! I\'m the Settlr Agent. Tell me what you\'re looking for in a neighbourhood, and I\'ll help you find the best matches!' }
+  ]);
+  const [input, setInput] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -182,7 +198,14 @@ const MapPage: React.FC = () => {
             {/* Collapsible Chat Content */}
             {showChat && (
               <div className="p-4">
-                <SettlrAgent />
+                <SettlrAgent 
+                  messages={messages}
+                  setMessages={setMessages}
+                  input={input}
+                  setInput={setInput}
+                  loading={loading}
+                  setLoading={setLoading}
+                />
               </div>
             )}
           </div>
