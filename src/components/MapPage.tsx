@@ -59,30 +59,32 @@ const SettlrAgent: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-50 rounded-lg shadow-lg p-6 flex flex-col h-[32rem] max-h-[80vh] border-l-4 border-green-600">
-      <div className="flex items-center mb-2">
-        <div className="w-3 h-3 bg-green-600 rounded-full mr-3"></div>
-        <h3 className="text-lg font-semibold text-green-700 flex items-center">
-          <svg className="w-6 h-6 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" strokeWidth="2" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 15s1.5 2 4 2 4-2 4-2" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 9h.01M15 9h.01" />
-          </svg>
-          Settlr Agent AI Chat
-        </h3>
-      </div>
-      <div className="flex-1 overflow-y-auto bg-gray-50 rounded p-3 mb-3 border border-gray-100">
+    <div className="p-6 flex flex-col h-[24rem] max-h-[80vh]">
+      <div className="flex-1 overflow-y-auto rounded p-3 mb-3 ">
         {messages.map((msg, idx) => (
-          <div key={idx} className={`mb-2 flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`px-4 py-2 rounded-lg max-w-xs text-sm ${msg.sender === 'user' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
-              {msg.text}
+          <div key={idx} className={`mb-4 flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
+              msg.sender === 'user' 
+                ? 'bg-indigo-600 text-white rounded-br-md' 
+                : 'bg-gray-100 text-gray-800 rounded-bl-md border border-gray-200'
+            }`}>
+              <div className="text-sm leading-relaxed">
+                {msg.text}
+              </div>
             </div>
           </div>
         ))}
         {loading && (
-          <div className="mb-2 flex justify-start">
-            <div className="px-4 py-2 rounded-lg max-w-xs text-sm bg-gray-200 text-gray-800 animate-pulse">
-              Settlr Agent is typing...
+          <div className="mb-4 flex justify-start">
+            <div className="bg-gray-100 text-gray-800 rounded-2xl rounded-bl-md border border-gray-200 px-4 py-3">
+              <div className="flex items-center space-x-2">
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                </div>
+                <span className="text-sm text-gray-600">Settlr Agent is typing...</span>
+              </div>
             </div>
           </div>
         )}
@@ -111,7 +113,8 @@ const SettlrAgent: React.FC = () => {
 };
 
 const MapPage: React.FC = () => {
-  const [showMap, setShowMap] = useState(false);
+  const [showMap, setShowMap] = useState(true);
+  const [showChat, setShowChat] = useState(true);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -122,139 +125,70 @@ const MapPage: React.FC = () => {
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Interactive Neighbourhood Map</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Choose your preferred way to find neighbourhoods: use detailed search preferences, chat with our Settlr Agent AI, or explore the interactive map.
+              Chat with our Settlr Agent AI to find your perfect neighbourhood, or explore the interactive map with detailed socioeconomic data.
             </p>
           </div>
-
-          {/* Search Options Header */}
-          <div className="text-center mb-8">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Choose Your Search Method</h3>
-            <div className="flex justify-center space-x-8">
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 bg-indigo-600 rounded-full"></div>
-                <span className="text-gray-700 font-medium">Manual Search Preferences</span>
-              </div>
-              <div className="text-gray-400">OR</div>
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 bg-green-600 rounded-full"></div>
-                <span className="text-gray-700 font-medium">Settlr Agent AI Chat</span>
-              </div>
-              <div className="text-gray-400">OR</div>
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 bg-blue-600 rounded-full"></div>
-                <span className="text-gray-700 font-medium">Interactive Map</span>
-              </div>
-            </div>
+      {/* Interactive Map Section */}
+        <div className="mt-8">
+          <div className="text-center mb-6">
+            <button
+              onClick={() => setShowMap(!showMap)}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center mx-auto"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              {showMap ? 'Hide Interactive Map' : 'Show Interactive Map'}
+            </button>
           </div>
-
-          {/* Responsive grid: preferences + chatbot */}
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Left: Preferences and Results stacked */}
-            <div className="flex flex-col space-y-8">
-              <div className="bg-gray-50 rounded-lg p-6 border-l-4 border-indigo-600">
-                <div className="flex items-center mb-4">
-                  <div className="w-3 h-3 bg-indigo-600 rounded-full mr-3"></div>
-                  <h3 className="text-lg font-semibold text-gray-900">Manual Search Preferences</h3>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Education Proximity</label>
-                    <select className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                      <option>High Priority</option>
-                      <option>Medium Priority</option>
-                      <option>Low Priority</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Socioeconomic Growth Potential</label>
-                    <select className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                      <option>High</option>
-                      <option>Moderate</option>
-                      <option>Low</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Crime Rates</label>
-                    <select className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                      <option>Very Low</option>
-                      <option>Low</option>
-                      <option>Average</option>
-                      <option>High</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Job Opportunities</label>
-                    <select className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                      <option>Excellent</option>
-                      <option>Good</option>
-                      <option>Average</option>
-                      <option>Poor</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-6 border-l-4 border-indigo-600">
-                <div className="flex items-center mb-4">
-                  <div className="w-3 h-3 bg-indigo-600 rounded-full mr-3"></div>
-                  <h3 className="text-lg font-semibold text-gray-900">AI Analysis Results</h3>
-                </div>
-                <div className="space-y-4">
-                  <div className="bg-white rounded-lg p-4 border">
-                    <h4 className="font-semibold text-gray-900 mb-2">Top Recommended Neighbourhoods</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Downtown Core</span>
-                        <span className="text-sm font-semibold text-green-600">95% Match</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Midtown District</span>
-                        <span className="text-sm font-semibold text-green-600">87% Match</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Riverside Community</span>
-                        <span className="text-sm font-semibold text-green-600">82% Match</span>
-                      </div>
-                    </div>
-                  </div>
-                  <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200">
-                    Run AI Analysis
-                  </button>
-                </div>
+            
+          {showMap && (
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="h-[600px] w-full">
+                <SocioEconomicStatsMap />
               </div>
             </div>
-            {/* Right: Settlr Agent Chatbot */}
-            <div className="h-full flex flex-col">
-              <SettlrAgent />
-            </div>
-          </div>
+          )}
+        </div>
 
-          {/* Interactive Map Section */}
-          <div className="mt-8">
-            <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Interactive Toronto Neighbourhood Map</h3>
-              <p className="text-gray-600 mb-4">
-                Explore Toronto neighbourhoods with detailed socioeconomic statistics and growth potential data.
-              </p>
+        {/* AI Chat Section */}
+        <div className="max-w-2xl mx-auto mb-8 mt-12">
+          <div className="bg-white rounded-lg shadow-lg border border-gray-200">
+            {/* Chat Header with Toggle */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-green-600 rounded-full mr-3"></div>
+                <h3 className="text-lg font-semibold text-gray-900">Settlr Agent AI Chat</h3>
+              </div>
               <button
-                onClick={() => setShowMap(!showMap)}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center mx-auto"
+                onClick={() => setShowChat(!showChat)}
+                className="flex items-center space-x-2 text-gray-500 hover:text-gray-700 transition-colors"
               >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                <span className="text-sm font-medium">
+                  {showChat ? 'Hide Chat' : 'Show Chat'}
+                </span>
+                <svg 
+                  className={`w-5 h-5 transition-transform duration-200 ${showChat ? 'rotate-180' : ''}`}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
-                {showMap ? 'Hide Interactive Map' : 'Show Interactive Map'}
               </button>
             </div>
             
-            {showMap && (
-              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div className="h-[600px] w-full">
-                  <SocioEconomicStatsMap />
-                </div>
+            {/* Collapsible Chat Content */}
+            {showChat && (
+              <div className="p-4">
+                <SettlrAgent />
               </div>
             )}
           </div>
+        </div>
+
+          
         </div>
       </div>
       <Footer />
