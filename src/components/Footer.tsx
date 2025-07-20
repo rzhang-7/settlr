@@ -27,7 +27,7 @@ const Footer = () => {
             </div>
             <p className="text-gray-400 mb-6 max-w-md">
               AI-powered neighbourhood discovery platform helping you find the perfect place to call home 
-              based on your unique preferences for education, culture, affordability, and lifestyle.
+              based on your unique preferences for education, safety, and job opportunities.
             </p>
             <div className="flex space-x-4">
               <a
