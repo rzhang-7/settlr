@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from fastapi.responses import HTMLResponse
 from typing import List, Literal, Dict, Any
 import json
+from fastapi.responses import JSONResponse
 
 # --- Imports for Geocoding and Distance ---
 from geopy.geocoders import Nominatim
@@ -256,3 +257,16 @@ async def show_top_3_mongo():
     
     except Exception as e:
         return f"<h1>Database Error</h1><p>{str(e)}</p>", 500
+
+@app.get("/api/neighbourhoods", response_class=JSONResponse, summary="Get all neighbourhood socioeconomic stats as JSON")
+async def get_all_neighbourhoods():
+    """
+    Returns all neighbourhood socioeconomic stats from MongoDB as JSON.
+    """
+    try:
+        db = get_db_connection()
+        collection = db["csvdata"]
+        data = list(collection.find({}, {'_id': 0}))
+        return JSONResponse(content=data)
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)

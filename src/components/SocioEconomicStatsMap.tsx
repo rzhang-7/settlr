@@ -73,70 +73,61 @@ const SocioEconomicStatsMap: React.FC = () => {
   const [statRange, setStatRange] = useState<StatRange>({ min: 0, max: 1 });
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Load and parse CSV data
+  // Load and parse data from backend API
   useEffect(() => {
-    fetch('/SocioeconomicStats.csv')
-      .then(res => res.text())
-      .then(csvText => {
-        Papa.parse<Neighbourhood>(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          complete: (results) => {
-            const data: Neighbourhood[] = (results.data as any[]).map((row: any) => {
-              // Parse geometry from WKT format
-              let geometry = null;
-              try {
-                if (row.geometry && row.geometry.startsWith('MULTIPOLYGON')) {
-                  const coords = row.geometry
-                    .replace('MULTIPOLYGON (((', '')
-                    .replace(')))', '')
-                    .split('), (')
-                    .map((poly: string) => [
-                      poly.split(', ').map((pair: string) => {
-                        const [lng, lat] = pair.split(' ').map(Number);
-                        return [lng, lat];
-                      })
-                    ]);
-                  geometry = {
-                    type: 'MultiPolygon',
-                    coordinates: coords,
-                  };
-                }
-              } catch (e) {
-                console.warn('Failed to parse geometry for:', row.AREA_NAME);
-                geometry = null;
-              }
-              
-              // Parse numeric statistics with robust error handling
-              const parseStat = (field: string): number => {
-                const val = row[field];
-                if (val === null || val === undefined || val === '') return 0;
-                const num = parseFloat(val.toString().trim());
-                return isNaN(num) ? 0 : num;
+    fetch('http://localhost:8000/api/neighbourhoods')
+      .then(res => res.json())
+      .then((data: any[]) => {
+        const parsed: Neighbourhood[] = data.map((row: any) => {
+          // Parse geometry from WKT format if needed
+          let geometry = null;
+          try {
+            if (row.geometry && typeof row.geometry === 'string' && row.geometry.startsWith('MULTIPOLYGON')) {
+              const coords = row.geometry
+                .replace('MULTIPOLYGON (((', '')
+                .replace(')))', '')
+                .split('), (')
+                .map((poly: string) => [
+                  poly.split(', ').map((pair: string) => {
+                    const [lng, lat] = pair.split(' ').map(Number);
+                    return [lng, lat];
+                  })
+                ]);
+              geometry = {
+                type: 'MultiPolygon',
+                coordinates: coords,
               };
-              
-              return {
-                HOOD_ID: row.HOOD_ID,
-                AREA_NAME: row.AREA_NAME,
-                geometry,
-                growth_potential_score: parseStat('growth_potential_score'),
-                safety_score: parseStat('safety_score'),
-                school_score: parseStat('school_score'),
-                business_job_score: parseStat('business_job_score'),
-              };
-            }).filter((n: Neighbourhood) => n.geometry); // Only include neighbourhoods with valid geometry
-            
-            setNeighbourhoods(data);
-            setLoading(false);
-          },
-          error: (error: Error) => {
-            console.error('Error parsing CSV:', error);
-            setLoading(false);
+            } else if (row.geometry && typeof row.geometry === 'object') {
+              geometry = row.geometry;
+            }
+          } catch (e) {
+            console.warn('Failed to parse geometry for:', row.AREA_NAME);
+            geometry = null;
           }
-        });
+
+          // Parse numeric statistics with robust error handling
+          const parseStat = (field: string): number => {
+            const val = row[field];
+            if (val === null || val === undefined || val === '') return 0;
+            const num = parseFloat(val.toString().trim());
+            return isNaN(num) ? 0 : num;
+          };
+
+          return {
+            HOOD_ID: row.HOOD_ID,
+            AREA_NAME: row.AREA_NAME,
+            geometry,
+            growth_potential_score: parseStat('growth_potential_score'),
+            safety_score: parseStat('safety_score'),
+            school_score: parseStat('school_score'),
+            business_job_score: parseStat('business_job_score'),
+          };
+        }).filter((n: Neighbourhood) => n.geometry); // Only include neighbourhoods with valid geometry
+        setNeighbourhoods(parsed);
+        setLoading(false);
       })
       .catch(error => {
-        console.error('Error loading CSV:', error);
+        console.error('Error loading neighbourhood data:', error);
         setLoading(false);
       });
   }, []);
